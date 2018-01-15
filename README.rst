@@ -21,7 +21,6 @@ curl 'https://oapi.dingtalk.com/robot/send?access_token=xxxxxxxx' \
 ::
 
   pip install DingtalkChatbot
-  pip helllo
 
 
 三、各种消息类型使用示例
