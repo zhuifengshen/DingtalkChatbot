@@ -139,6 +139,8 @@
 
 **哥们，更多使用场景，尽情展开想象吧...**
 
+（如果对你有帮助的话，欢迎**star**）
+
 .. |image0| image:: https://raw.githubusercontent.com/zhuifengshen/DingtalkChatbot/master/img/text_at_all.png
 .. |image1| image:: https://raw.githubusercontent.com/zhuifengshen/DingtalkChatbot/master/img/text_at_one.png
 .. |image2| image:: https://raw.githubusercontent.com/zhuifengshen/DingtalkChatbot/master/img/link.png
