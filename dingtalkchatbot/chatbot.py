@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
 # create time: 07/01/2018 11:35
+__author__ = 'Devin -- http://zhangchuzhao.site'
 
 import json
 import logging
