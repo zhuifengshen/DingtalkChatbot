@@ -5,7 +5,7 @@ __author__ = 'Devin -- http://zhangchuzhao.site'
 import json
 import logging
 import requests
-from dingtalkchatbot.chatbot import DtalkChatbot, ActionCard, FeedLink
+from dingtalkchatbot.chatbot import DingtalkChatbot, ActionCard, FeedLink
 
 logging.basicConfig(level=logging.INFO)
 
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     # 用户手机号列表
     at_mobiles = ['这里填写需要提醒的用户的手机号码，字符串或数字都可以']
     # 初始化机器人小丁
-    xiaoding = DtalkChatbot(webhook)
+    xiaoding = DingtalkChatbot(webhook)
     # text
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', is_at_all=True)
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', at_mobiles=at_mobiles)

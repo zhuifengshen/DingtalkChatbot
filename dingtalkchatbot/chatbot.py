@@ -29,7 +29,7 @@ def is_not_null_and_blank_str(content):
         return False
 
 
-class DtalkChatbot(object):
+class DingtalkChatbot(object):
     """
     钉钉群自定义机器人（每个机器人每分钟最多发送20条），支持文本（text）、连接（link）、markdown三种消息类型！
     """
@@ -38,7 +38,7 @@ class DtalkChatbot(object):
         机器人初始化
         :param webhook:
         """
-        super(DtalkChatbot, self).__init__()
+        super(DingtalkChatbot, self).__init__()
         self.headers = {'Content-Type': 'application/json; charset=utf-8'}
         self.webhook = webhook
 
