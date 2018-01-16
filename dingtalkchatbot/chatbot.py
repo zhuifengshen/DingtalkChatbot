@@ -161,6 +161,7 @@ class DtalkChatbot(object):
             logging.info('发送结果：%s' % result)
             if result['errcode']:
                 error_data = {"msgtype": "text", "text": {"content": "钉钉机器人消息发送失败，原因：%s" % result['errmsg']}, "at": {"isAtAll": True}}
+                logging.error("消息发送失败，重新发送：%s" % error_data)
                 requests.post(self.webhook, headers=self.headers, data=json.dumps(error_data))
             return result
 
