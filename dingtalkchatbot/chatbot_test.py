@@ -9,21 +9,12 @@ __author__ = 'Devin -- http://zhangchuzhao.site'
 
 
 class TestDingtalkChatbot(unittest.TestCase):
+    """DingtalkChatbot 测试用例"""
 
     @classmethod
     def setUpClass(cls):
         cls.webhook = 'https://oapi.dingtalk.com/robot/send?access_token=5076484a5a431b30bcd9d153014fba5ce4df0fdbee069a4a3eb3066ddfe55a9f'
         cls.xiaoding = DingtalkChatbot(cls.webhook)
-
-    @classmethod
-    def tearDownClass(cls):
-        pass
-
-    def sutUp(self):
-        pass
-
-    def tearDown(self):
-        pass
 
     def test_is_not_null_and_blank_str(self):
         """测试字符串不为空函数"""
@@ -49,7 +40,7 @@ class TestDingtalkChatbot(unittest.TestCase):
                                                   '> 9度，西北风1级，空气良89，相对温度73%\n\n'
                                                   '> ![美景](http://www.sinaimg.cn/dy/slidenews/5_img/2013_28/453_28488_469248.jpg)\n'
                                                   '> ###### 10点20分发布 [天气](http://www.thinkpage.cn/) \n',
-                               is_at_all=True)
+                                             is_at_all=True)
         self.assertEqual(result['errcode'], 0)
 
     def test_send_actioncard(self):

@@ -20,7 +20,14 @@ setup(
     author_email="1324556701@qq.com",
     url="https://github.com/zhuifengshen/DingtalkChatbot",
     license='MIT',
-    keywords='dingtalk chatbot',
+    keywords='dingtalk dingding chatbot robot bot',
     install_requires=install_requires,
-    setup_requires=['setuptools']
+    setup_requires=['setuptools'],
+    classifiers=[
+        "Development Status :: 5 - Production/Stable",
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6'
+    ]
 )
