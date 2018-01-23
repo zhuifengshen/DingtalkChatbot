@@ -43,6 +43,7 @@
 
 .. code:: python
 
+    from dingtalkchatbot.chatbot import DingtalkChatbot
     # WebHook地址
     webhook = 'https://oapi.dingtalk.com/robot/send?access_token=这里填写自己钉钉群自定义机器人的token'
     # 初始化机器人小丁
