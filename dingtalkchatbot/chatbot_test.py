@@ -31,7 +31,7 @@ class TestDingtalkChatbot(unittest.TestCase):
 
     def test_send_link(self):
         """测试发送链接消息函数"""
-        result = self.xiaoding.send_link(title='万万没想到，李小璐竟然...', text='故事是这样子的...', message_url='http://www.kwongwah.com.my/?p=454748", pic_url="https://pbs.twimg.com/media/CEwj7EDWgAE5eIF.jpg')
+        result = self.xiaoding.send_link(title='万万没想到，某小璐竟然...', text='故事是这样子的...', message_url='http://www.kwongwah.com.my/?p=454748", pic_url="https://pbs.twimg.com/media/CEwj7EDWgAE5eIF.jpg')
         self.assertEqual(result['errcode'], 0)
 
     def test_send_markdown(self):
