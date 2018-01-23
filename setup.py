@@ -2,7 +2,7 @@
 # _*_ coding:utf-8 _*_
 # create time: 13/01/2018 20:41
 import io
-from setuptools import setup
+from setuptools import setup, find_packages
 
 with io.open("README.rst", encoding='utf-8') as f:
     long_description = f.read()
@@ -12,7 +12,8 @@ with io.open("requirements.txt", encoding='utf-8') as f:
 
 setup(
     name="DingtalkChatbot",
-    version="1.1.2",
+    version="1.1.3",
+    packages=find_packages(),
     description="DingtalkChatbot is a Python wrapper tool for dingtalk custom chatbot messages.",
     long_description=long_description,
     author="Devin Zhang",

@@ -46,7 +46,7 @@
     # WebHook地址
     webhook = 'https://oapi.dingtalk.com/robot/send?access_token=这里填写自己钉钉群自定义机器人的token'
     # 初始化机器人小丁
-    xiaoding = DtalkChatbot(webhook)
+    xiaoding = DingtalkChatbot(webhook)
     # Text消息@所有人
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', is_at_all=True)
 
