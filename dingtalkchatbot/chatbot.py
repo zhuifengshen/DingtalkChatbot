@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
 # create time: 07/01/2018 11:35
+import time
+from json import JSONDecodeError
+
 __author__ = 'Devin -- http://zhangchuzhao.site'
 
 import json
@@ -36,11 +39,13 @@ class DingtalkChatbot(object):
     def __init__(self, webhook):
         """
         机器人初始化
-        :param webhook:
+        :param webhook: 钉钉群自定义机器人webhook地址
         """
         super(DingtalkChatbot, self).__init__()
         self.headers = {'Content-Type': 'application/json; charset=utf-8'}
         self.webhook = webhook
+        self.times = 0
+        self.start_time = time.time()
 
     def send_text(self, msg, is_at_all=False, at_mobiles=[]):
         """
@@ -61,7 +66,7 @@ class DingtalkChatbot(object):
             at_mobiles = list(map(str, at_mobiles))
 
         data["at"] = {"atMobiles": at_mobiles, "isAtAll": is_at_all}
-        logging.info('text类型：%s' % data)
+        logging.debug('text类型：%s' % data)
         return self.post(data)
 
     def send_link(self, title, text, message_url, pic_url=''):
@@ -84,7 +89,7 @@ class DingtalkChatbot(object):
                         "messageUrl": message_url
                     }
             }
-            logging.info('link类型：%s' % data)
+            logging.debug('link类型：%s' % data)
             return self.post(data)
         else:
             logging.error("link类型中消息标题或内容或链接不能为空！")
@@ -111,7 +116,7 @@ class DingtalkChatbot(object):
                     "isAtAll": is_at_all
                 }
             }
-            logging.info("markdown类型：%s" % data)
+            logging.debug("markdown类型：%s" % data)
             return self.post(data)
         else:
             logging.error("markdown类型中消息标题或内容不能为空！")
@@ -125,7 +130,7 @@ class DingtalkChatbot(object):
         """
         if isinstance(action_card, ActionCard):
             data = action_card.get_data()
-            logging.info("ActionCard类型：%s" % data)
+            logging.debug("ActionCard类型：%s" % data)
             return self.post(data)
         else:
             logging.error("ActionCard类型：传入的实例类型不正确！")
@@ -137,8 +142,15 @@ class DingtalkChatbot(object):
         :param links: 信息集（FeedLink数组）
         :return: 返回消息发送结果
         """
+        link_data_list = []
+        for link in links:
+            if isinstance(link, FeedLink) or isinstance(link, CardItem):
+                link_data_list.append(link.get_data())
+        if link_data_list:
+            # 兼容：1、传入FeedLink或CardItem实例列表；2、传入数据字典列表；
+            links = link_data_list
         data = {"msgtype": "feedCard", "feedCard": {"links": links}}
-        logging.info("FeedCard类型：%s" % data)
+        logging.debug("FeedCard类型：%s" % data)
         return self.post(data)
 
     def post(self, data):
@@ -147,6 +159,13 @@ class DingtalkChatbot(object):
         :param data: 消息数据（字典）
         :return: 返回发送结果
         """
+        self.times += 1
+        if self.times % 20 == 0:
+            if time.time() - self.start_time < 60:
+                logging.debug('钉钉官方限制每个机器人每分钟最多发送20条，当前消息发送频率已达到限制条件，休眠一分钟')
+                time.sleep(60)
+            self.start_time = time.time()
+
         post_data = json.dumps(data)
         try:
             response = requests.post(self.webhook, headers=self.headers, data=post_data)
@@ -156,14 +175,25 @@ class DingtalkChatbot(object):
         except requests.exceptions.ConnectionError:
             logging.error("消息发送失败，HTTP connection error!")
             raise
+        except requests.exceptions.Timeout:
+            logging.error("消息发送失败，Timeout error!")
+            raise
+        except requests.exceptions.RequestException:
+            logging.error("消息发送失败, Request Exception!")
+            raise
         else:
-            result = response.json()
-            logging.info('发送结果：%s' % result)
-            if result['errcode']:
-                error_data = {"msgtype": "text", "text": {"content": "钉钉机器人消息发送失败，原因：%s" % result['errmsg']}, "at": {"isAtAll": True}}
-                logging.error("消息发送失败，重新发送：%s" % error_data)
-                requests.post(self.webhook, headers=self.headers, data=json.dumps(error_data))
-            return result
+            try:
+                result = response.json()
+            except JSONDecodeError:
+                logging.error("服务器响应异常，状态码：%s，响应内容：%s" % (response.status_code, response.text))
+                return {'errcode': 500, 'errmsg': '服务器响应异常'}
+            else:
+                logging.debug('发送结果：%s' % result)
+                if result['errcode']:
+                    error_data = {"msgtype": "text", "text": {"content": "钉钉机器人消息发送失败，原因：%s" % result['errmsg']}, "at": {"isAtAll": True}}
+                    logging.error("消息发送失败，自动通知：%s" % error_data)
+                    requests.post(self.webhook, headers=self.headers, data=json.dumps(error_data))
+                return result
 
 
 class ActionCard(object):
@@ -175,7 +205,8 @@ class ActionCard(object):
         ActionCard初始化
         :param title: 首屏会话透出的展示内容
         :param text: markdown格式的消息
-        :param btns: 按钮数量为1时，整体跳转ActionCard类型，按钮的消息：singleTitle - 单个按钮的方案，singleURL - 点击按钮触发的URL；
+        :param btns: 按钮列表类型；
+                     按钮数量为1时，整体跳转ActionCard类型，按钮的消息：singleTitle - 单个按钮的方案，singleURL - 点击按钮触发的URL；
                      按钮数量大于1时，独立跳转ActionCard类型，按钮的消息：title - 按钮方案，actionURL - 点击按钮触发的URL；
         :param btn_orientation: 0：按钮竖直排列，1：按钮横向排列
         :param hide_avatar: 0：正常发消息者头像，1：隐藏发消息者头像
@@ -183,13 +214,20 @@ class ActionCard(object):
         super(ActionCard, self).__init__()
         self.title = title
         self.text = text
-        self.btns = btns
         self.btn_orientation = btn_orientation
         self.hide_avatar = hide_avatar
+        btn_list = []
+        for btn in btns:
+            if isinstance(btn, CardItem):
+                btn_list.append(btn.get_data())
+        if btn_list:
+            # 兼容：1、传入CardItem示例列表；2、传入数据字典列表
+            btns = btn_list
+        self.btns = btns
 
     def get_data(self):
         """
-        ActionCard类型消息数据（字典）
+        获取ActionCard类型消息数据（字典）
         :return: 返回ActionCard数据
         """
         if is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.text) and len(self.btns):
@@ -243,8 +281,8 @@ class FeedLink(object):
 
     def get_data(self):
         """
-        获取单条消息数据（字典）
-        :return: 单条消息数据
+        获取FeedLink消息数据（字典）
+        :return: 本FeedLink消息的数据
         """
         if is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.message_url) and is_not_null_and_blank_str(self.pic_url):
             data = {
@@ -256,6 +294,46 @@ class FeedLink(object):
         else:
             logging.error("FeedCard类型单条消息文本、消息链接、图片链接不能为空！")
             raise ValueError("FeedCard类型单条消息文本、消息链接、图片链接不能为空！")
+
+
+class CardItem(object):
+    """
+    ActionCard和FeedCard消息类型中的子控件
+    """
+
+    def __init__(self, title, url, pic_url=None):
+        """
+        CardItem初始化
+        @param title: 子控件名称
+        @param url: 点击子控件时触发的URL
+        @param pic_url: FeedCard的图片地址，ActionCard时不需要，故默认为None
+        """
+        super(CardItem, self).__init__()
+        self.title = title
+        self.url = url
+        self.pic_url = pic_url
+
+    def get_data(self):
+        """
+        获取CardItem子控件数据（字典）
+        @return: 子控件的数据
+        """
+        if is_not_null_and_blank_str(self.pic_url) and is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.url):
+            data = {
+                "title": self.title,
+                "messageURL": self.url,
+                "picURL": self.pic_url
+            }
+            return data
+        elif is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.url):
+            data = {
+                "title": self.title,
+                "actionURL": self.url
+            }
+            return data
+        else:
+            logging.error("CardItem是ActionCard的子控件时，title、url不能为空；是FeedCard的子控件时，title、url、pic_url不能为空！")
+            raise ValueError("CardItem是ActionCard的子控件时，title、url不能为空；是FeedCard的子控件时，title、url、pic_url不能为空！")
 
 
 if __name__ == '__main__':

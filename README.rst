@@ -36,6 +36,7 @@
 -  支持ActionCard消息；
 -  支持消息发送失败时自动通知；
 -  支持Python2、Python3；
+-  支持钉钉官方消息发送频率限制限制：每个机器人每分钟最多发送20条；
 
 三、各消息类型使用示例
 ======================
@@ -94,18 +95,18 @@
 .. code:: python
 
     # FeedCard消息类型
-    feedlink1 = FeedLink(title="氧气美女", message_url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
-    feedlink2 = FeedLink(title="氧眼美女", message_url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
-    feedlink3 = FeedLink(title="氧神美女", message_url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
-    links = [feedlink1.get_data(), feedlink2.get_data(), feedlink3.get_data()]
-    xiaoding.send_feed_card(links)
+    card1 = CardItem(title="氧气美女", url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
+    card2 = CardItem(title="氧眼美女", url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
+    card3 = CardItem(title="氧神美女", url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
+    cards = [card1, card2, card3]
+    xiaoding.send_feed_card(cards)
 
 |image6|
 
 .. code:: python
 
     # ActionCard整体跳转消息类型
-    btns1 = [{"title": "查看详情", "actionURL": "https://www.dingtalk.com/"}]
+    btns1 = [CardItem(title="查看详情", url="https://www.dingtalk.com/")]
     actioncard1 = ActionCard(title='万万没想到，竟然...',
                                  text='![选择](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
                                  btns=btns1,
@@ -118,7 +119,7 @@
 .. code:: python
 
     # ActionCard独立跳转消息类型（双选项）
-    btns2 = [{"title": "支持", "actionURL": "https://www.dingtalk.com/"}, {"title": "反对", "actionURL": "http://www.back china.com/news/2018/01/11/537468.html"}]
+    btns2 = [CardItem(title="支持", url="https://www.dingtalk.com/"), CardItem(title="反对", url="https://www.dingtalk.com/")]
     actioncard2 = ActionCard(title='万万没想到，竟然...',
                                  text='![选择](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
                                  btns=btns2,
@@ -131,7 +132,7 @@
 .. code:: python
 
     # ActionCard独立跳转消息类型（列表选项）
-    btns3 = [{"title": "支持", "actionURL": "https://www.dingtalk.com/"}, {"title": "中立", "actionURL": "https://www.dingtalk.com/"}, {"title": "反对", "actionURL": "https://www.dingtalk.com/"}]
+    btns3 = [CardItem(title="支持", url="https://www.dingtalk.com/"), CardItem(title="中立", url="https://www.dingtalk.com/"), CardItem(title="反对", url="https://www.dingtalk.com/")]
         actioncard3 = ActionCard(title='万万没想到，竟然...',
                                  text='![选择](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
                                  btns=btns3,
