@@ -15,8 +15,7 @@ with io.open(os.path.join(here, 'dingtalkchatbot', '__about__.py'), encoding='ut
 with io.open("README.rst", encoding='utf-8') as f:
     long_description = f.read()
 
-with io.open("requirements.txt", encoding='utf-8') as f:
-    install_requires = f.readlines()
+install_requires = ["requests"]
 
 
 class UploadCommand(Command):
@@ -72,9 +71,9 @@ setup(
     author_email=about['__author_email__'],
     url=about['__url__'],
     license=about['__license__'],
+    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4',
     keywords='钉钉 机器人 dingtalk chatbot robot bot',
     install_requires=install_requires,
-    setup_requires=['setuptools'],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         'Programming Language :: Python :: 2.7',
