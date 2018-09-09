@@ -39,9 +39,8 @@ if __name__ == '__main__':
 
     # 整体跳转ActionCard
     btns1 = [CardItem(title="查看详情", url="https://www.dingtalk.com/")]
-    # btns1 = [{"title": "查看详情", "actionURL": "https://www.dingtalk.com/"}]
     actioncard1 = ActionCard(title='万万没想到，竟然...',
-                             text='![选择](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
+                             text='![markdown](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
                              btns=btns1,
                              btn_orientation=1,
                              hide_avatar=1)
@@ -50,18 +49,16 @@ if __name__ == '__main__':
     # 单独跳转ActionCard
     # 1、两个按钮选择
     btns2 = [CardItem(title="支持", url="https://www.dingtalk.com/"), CardItem(title="反对", url="https://www.dingtalk.com/")]
-    # btns2 = [{"title": "支持", "actionURL": "https://www.dingtalk.com/"}, {"title": "反对", "actionURL": "http://www.back china.com/news/2018/01/11/537468.html"}]
     actioncard2 = ActionCard(title='万万没想到，竟然...',
-                             text='![选择](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
+                             text='![markdown](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
                              btns=btns2,
                              btn_orientation=1,
                              hide_avatar=1)
     xiaoding.send_action_card(actioncard2)
     # 2、三个按钮选择
     btns3 = [CardItem(title="支持", url="https://www.dingtalk.com/"), CardItem(title="中立", url="https://www.dingtalk.com/"), CardItem(title="反对", url="https://www.dingtalk.com/")]
-    # btns3 = [{"title": "支持", "actionURL": "https://www.dingtalk.com/"}, {"title": "中立", "actionURL": "https://www.dingtalk.com/"}, {"title": "反对", "actionURL": "https://www.dingtalk.com/"}]
     actioncard3 = ActionCard(title='万万没想到，竟然...',
-                             text='![选择](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
+                             text='![markdown](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
                              btns=btns3,
                              btn_orientation=1,
                              hide_avatar=1)

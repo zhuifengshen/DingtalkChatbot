@@ -205,9 +205,7 @@ class ActionCard(object):
         ActionCard初始化
         :param title: 首屏会话透出的展示内容
         :param text: markdown格式的消息
-        :param btns: 按钮列表类型；
-                     按钮数量为1时，整体跳转ActionCard类型，按钮的消息：singleTitle - 单个按钮的方案，singleURL - 点击按钮触发的URL；
-                     按钮数量大于1时，独立跳转ActionCard类型，按钮的消息：title - 按钮方案，actionURL - 点击按钮触发的URL；
+        :param btns: 按钮列表：（1）按钮数量为1时，整体跳转ActionCard类型；（2）按钮数量大于1时，独立跳转ActionCard类型；
         :param btn_orientation: 0：按钮竖直排列，1：按钮横向排列
         :param hide_avatar: 0：正常发消息者头像，1：隐藏发消息者头像
         """
@@ -221,8 +219,7 @@ class ActionCard(object):
             if isinstance(btn, CardItem):
                 btn_list.append(btn.get_data())
         if btn_list:
-            # 兼容：1、传入CardItem示例列表；2、传入数据字典列表
-            btns = btn_list
+            btns = btn_list  # 兼容：1、传入CardItem示例列表；2、传入数据字典列表
         self.btns = btns
 
     def get_data(self):
@@ -232,7 +229,7 @@ class ActionCard(object):
         """
         if is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.text) and len(self.btns):
             if len(self.btns) == 1:
-                # 独立跳转
+                # 整体跳转ActionCard类型
                 data = {
                         "msgtype": "actionCard",
                         "actionCard": {
@@ -246,7 +243,7 @@ class ActionCard(object):
                 }
                 return data
             else:
-                # 整体跳转
+                # 独立跳转ActionCard类型
                 data = {
                     "msgtype": "actionCard",
                     "actionCard": {
@@ -319,6 +316,7 @@ class CardItem(object):
         @return: 子控件的数据
         """
         if is_not_null_and_blank_str(self.pic_url) and is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.url):
+            # FeedCard类型
             data = {
                 "title": self.title,
                 "messageURL": self.url,
@@ -326,6 +324,7 @@ class CardItem(object):
             }
             return data
         elif is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.url):
+            # ActionCard类型
             data = {
                 "title": self.title,
                 "actionURL": self.url
