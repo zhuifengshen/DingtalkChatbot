@@ -143,7 +143,7 @@
 
     # ActionCard独立跳转消息类型（列表选项）
     btns3 = [CardItem(title="支持", url="https://www.dingtalk.com/"), CardItem(title="中立", url="https://www.dingtalk.com/"), CardItem(title="反对", url="https://www.dingtalk.com/")]
-        actioncard3 = ActionCard(title='万万没想到，竟然...',
+    actioncard3 = ActionCard(title='万万没想到，竟然...',
                                  text='![选择](http://www.songshan.es/wp-content/uploads/2016/01/Yin-Yang.png) \n### 故事是这样子的...',
                                  btns=btns3,
                                  btn_orientation=1,
