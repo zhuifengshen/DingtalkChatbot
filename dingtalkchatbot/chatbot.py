@@ -47,7 +47,7 @@ class DingtalkChatbot(object):
         self.times = 0
         self.start_time = time.time()
 
-    def send_text(self, msg, is_at_all=False, at_mobiles=[]):
+    def send_text(self, msg, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[]):
         """
         text类型
         :param msg: 消息内容
@@ -64,8 +64,9 @@ class DingtalkChatbot(object):
 
         if at_mobiles:
             at_mobiles = list(map(str, at_mobiles))
-
-        data["at"] = {"atMobiles": at_mobiles, "isAtAll": is_at_all}
+        if at_dingtalk_ids:
+            at_dingtalk_ids = list(map(str, at_dingtalk_ids))
+        data["at"] = {"atMobiles": at_mobiles, "atDingtalkIds": at_dingtalk_ids, "isAtAll": is_at_all}
         logging.debug('text类型：%s' % data)
         return self.post(data)
 
@@ -95,7 +96,7 @@ class DingtalkChatbot(object):
             logging.error("link类型中消息标题或内容或链接不能为空！")
             raise ValueError("link类型中消息标题或内容或链接不能为空！")
 
-    def send_markdown(self, title, text, is_at_all=False, at_mobiles=[]):
+    def send_markdown(self, title, text, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[]):
         """
         markdown类型
         :param title: 首屏会话透出的展示内容
@@ -113,6 +114,7 @@ class DingtalkChatbot(object):
                 },
                 "at": {
                     "atMobiles": list(map(str, at_mobiles)),
+                    "atDingtalkIds": list(map(str, at_dingtalk_ids)),
                     "isAtAll": is_at_all
                 }
             }
