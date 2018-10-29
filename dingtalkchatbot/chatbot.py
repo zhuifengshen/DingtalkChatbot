@@ -1,14 +1,16 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
 # create time: 07/01/2018 11:35
-import time
-from json import JSONDecodeError
-
 __author__ = 'Devin -- http://zhangchuzhao.site'
 
 import json
+import time
 import logging
 import requests
+try:
+    JSONDecodeError = json.decoder.JSONDecodeError
+except AttributeError:
+    JSONDecodeError = ValueError
 
 
 def is_not_null_and_blank_str(content):
