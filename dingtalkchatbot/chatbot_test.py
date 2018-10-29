@@ -29,6 +29,11 @@ class TestDingtalkChatbot(unittest.TestCase):
         result = self.xiaoding.send_text(msg='我就是小丁，小丁就是我！', is_at_all=True)
         self.assertEqual(result['errcode'], 0)
 
+    def test_send_image(self):
+        """测试发送表情图片消息函数"""
+        result = self.xiaoding.send_image(pic_url='http://uc-test-manage-00.umlife.net/jenkins/pic/flake8.png')
+        self.assertEqual(result['errcode'], 0)
+
     def test_send_link(self):
         """测试发送链接消息函数"""
         result = self.xiaoding.send_link(title='万万没想到，某小璐竟然...', text='故事是这样子的...', message_url='http://www.kwongwah.com.my/?p=454748", pic_url="https://pbs.twimg.com/media/CEwj7EDWgAE5eIF.jpg')

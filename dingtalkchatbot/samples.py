@@ -20,6 +20,9 @@ if __name__ == '__main__':
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', is_at_all=True)
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', at_mobiles=at_mobiles)
 
+    # image表情
+    xiaoding.send_image(pic_url='http://uc-test-manage-00.umlife.net/jenkins/pic/flake8.png')
+
     # link
     xiaoding.send_link(title='万万没想到，某小璐竟然...', text='故事是这样子的...', message_url='http://www.kwongwah.com.my/?p=454748", pic_url="https://pbs.twimg.com/media/CEwj7EDWgAE5eIF.jpg')
 

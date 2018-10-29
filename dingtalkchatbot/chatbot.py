@@ -53,24 +53,50 @@ class DingtalkChatbot(object):
         """
         text类型
         :param msg: 消息内容
-        :param is_at_all: @所有人时：true，否则为false
-        :param at_mobiles: 被@人的手机号（字符串）
+        :param is_at_all: @所有人时：true，否则为false（可选）
+        :param at_mobiles: 被@人的手机号（可选）
+        :param at_dingtalk_ids: 被@人的dingtalkId（可选）
         :return: 返回消息发送结果
         """
-        data = {"msgtype": "text"}
+        data = {"msgtype": "text", "at": {}}
         if is_not_null_and_blank_str(msg):
             data["text"] = {"content": msg}
         else:
             logging.error("text类型，消息内容不能为空！")
             raise ValueError("text类型，消息内容不能为空！")
 
+        if is_at_all:
+            data["at"]["isAtAll"] = is_at_all
+
         if at_mobiles:
             at_mobiles = list(map(str, at_mobiles))
+            data["at"]["atMobiles"] = at_mobiles
+
         if at_dingtalk_ids:
             at_dingtalk_ids = list(map(str, at_dingtalk_ids))
-        data["at"] = {"atMobiles": at_mobiles, "atDingtalkIds": at_dingtalk_ids, "isAtAll": is_at_all}
+            data["at"]["atDingtalkIds"] = at_dingtalk_ids
+
         logging.debug('text类型：%s' % data)
         return self.post(data)
+
+    def send_image(self, pic_url):
+        """
+        image类型（表情）
+        :param pic_url: 图片表情链接
+        :return: 返回消息发送结果
+        """
+        if is_not_null_and_blank_str(pic_url):
+            data = {
+                "msgtype": "image",
+                "image": {
+                    "picURL": pic_url
+                }
+            }
+            logging.debug('image类型：%s' % data)
+            return self.post(data)
+        else:
+            logging.error("image类型中图片链接不能为空！")
+            raise ValueError("image类型中图片链接不能为空！")
 
     def send_link(self, title, text, message_url, pic_url=''):
         """
@@ -78,7 +104,7 @@ class DingtalkChatbot(object):
         :param title: 消息标题
         :param text: 消息内容（如果太长自动省略显示）
         :param message_url: 点击消息触发的URL
-        :param pic_url: 图片URL
+        :param pic_url: 图片URL（可选）
         :return: 返回消息发送结果
 
         """
@@ -103,8 +129,9 @@ class DingtalkChatbot(object):
         markdown类型
         :param title: 首屏会话透出的展示内容
         :param text: markdown格式的消息内容
-        :param is_at_all: 被@人的手机号（在text内容里要有@手机号）
-        :param at_mobiles: @所有人时：true，否则为：false
+        :param is_at_all: 被@人的手机号（在text内容里要有@手机号，可选）
+        :param at_mobiles: @所有人时：true，否则为：false（可选）
+        :param at_dingtalk_ids: 被@人的dingtalkId（可选）
         :return: 返回消息发送结果
         """
         if is_not_null_and_blank_str(title) and is_not_null_and_blank_str(text):
@@ -114,12 +141,19 @@ class DingtalkChatbot(object):
                     "title": title,
                     "text": text
                 },
-                "at": {
-                    "atMobiles": list(map(str, at_mobiles)),
-                    "atDingtalkIds": list(map(str, at_dingtalk_ids)),
-                    "isAtAll": is_at_all
-                }
+                "at": {}
             }
+            if is_at_all:
+                data["at"]["isAtAll"] = is_at_all
+
+            if at_mobiles:
+                at_mobiles = list(map(str, at_mobiles))
+                data["at"]["atMobiles"] = at_mobiles
+
+            if at_dingtalk_ids:
+                at_dingtalk_ids = list(map(str, at_dingtalk_ids))
+                data["at"]["atDingtalkIds"] = at_dingtalk_ids
+
             logging.debug("markdown类型：%s" % data)
             return self.post(data)
         else:
@@ -210,8 +244,8 @@ class ActionCard(object):
         :param title: 首屏会话透出的展示内容
         :param text: markdown格式的消息
         :param btns: 按钮列表：（1）按钮数量为1时，整体跳转ActionCard类型；（2）按钮数量大于1时，独立跳转ActionCard类型；
-        :param btn_orientation: 0：按钮竖直排列，1：按钮横向排列
-        :param hide_avatar: 0：正常发消息者头像，1：隐藏发消息者头像
+        :param btn_orientation: 0：按钮竖直排列，1：按钮横向排列（可选）
+        :param hide_avatar: 0：正常发消息者头像，1：隐藏发消息者头像（可选）
         """
         super(ActionCard, self).__init__()
         self.title = title

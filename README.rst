@@ -42,11 +42,13 @@
 
 -  支持Text消息；
 -  支持Link消息；
+-  支持image表情消息；
 -  支持Markdown消息；
 -  支持ActionCard消息；
 -  支持消息发送失败时自动通知；
 -  支持Python2、Python3；
 -  支持钉钉官方消息发送频率限制限制：每个机器人每分钟最多发送20条；
+-  支持钉钉开放平台之企业内部\ `自定义outgoing机器人消息发送 <https://open-doc.dingtalk.com/doc.htm#?docType=1&docId=108063&previewCode=BA089C5628865CADD5A760C40D515181>`__；
 
 三、各消息类型使用示例
 ======================
@@ -70,6 +72,15 @@
     # Text消息之@指定用户
     at_mobiles = ['这里填写需要提醒的用户的手机号码，字符串或数字都可以']
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', at_mobiles=at_mobiles)
+
+
+|image9|
+
+.. code:: python
+
+    # image表情消息
+    xiaoding.send_image(pic_url='http://uc-test-manage-00.umlife.net/jenkins/pic/flake8.png')
+
 
 |image2|
 
@@ -163,3 +174,4 @@
 .. |image6| image:: https://raw.githubusercontent.com/zhuifengshen/DingtalkChatbot/master/img/global_actioncard.png
 .. |image7| image:: https://raw.githubusercontent.com/zhuifengshen/DingtalkChatbot/master/img/select_actioncard.png
 .. |image8| image:: https://raw.githubusercontent.com/zhuifengshen/DingtalkChatbot/master/img/multi_actioncard.png
+.. |image9| image:: https://raw.githubusercontent.com/zhuifengshen/DingtalkChatbot/master/img/image_msg.png
