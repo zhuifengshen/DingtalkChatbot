@@ -11,7 +11,7 @@
 
 3、机器人支持Webhook自定义接入，就可以实现更多可能性，例如：将运维报警、自动化测试结果报告、工作&生活日程安排（上班打卡、下班吃饭、健身、读书、生日、纪念日...）的提醒；
 
-目前自定义机器人支持文本（text）、链接（link）、markdown三种消息格式，五种消息类型，详细信息请参考\ `自定义机器人官方文档 <https://open-doc.dingtalk.com/docs/doc.htm?spm=0.0.0.0.0Sds7z&treeId=257&articleId=105733&docType=1>`__
+目前自定义机器人支持文本（text）、链接（link）、markdown三种消息格式，五种消息类型，详细信息请参考\ `自定义机器人官方文档 <https://ding-doc.dingtalk.com/doc#/serverapi2/qf2nxq>`__
 
 二、安装使用
 ============
