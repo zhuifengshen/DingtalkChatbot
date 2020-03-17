@@ -3,10 +3,21 @@
 # create time: 07/01/2018 11:35
 __author__ = 'Devin -- http://zhangchuzhao.site'
 
+import re
 import json
 import time
 import logging
 import requests
+import urllib
+import hmac
+import base64
+import hashlib
+
+try:
+    quote_plus = urllib.parse.quote_plus
+except ArithmeticError:
+    quote_plus = urllib.quote_plus
+
 try:
     JSONDecodeError = json.decoder.JSONDecodeError
 except AttributeError:
@@ -38,16 +49,38 @@ class DingtalkChatbot(object):
     """
     钉钉群自定义机器人（每个机器人每分钟最多发送20条），支持文本（text）、连接（link）、markdown三种消息类型！
     """
-    def __init__(self, webhook):
+    def __init__(self, webhook, secret=None, pc_slide=False):
         """
         机器人初始化
         :param webhook: 钉钉群自定义机器人webhook地址
+        :param secret: 机器人安全设置页面勾选“加签”时需要传入的密钥
+        :param pc_slide: 消息链接打开方式，默认False为浏览器打开，设置为True时为PC端侧边栏打开
         """
         super(DingtalkChatbot, self).__init__()
         self.headers = {'Content-Type': 'application/json; charset=utf-8'}
-        self.webhook = webhook
         self.times = 0
         self.start_time = time.time()
+        if secret is not None and secret.startswith('SEC'):
+            timestamp = round(self.start_time * 1000)
+            string_to_sign = '{}\n{}'.format(timestamp, secret)
+            hmac_code = hmac.new(secret.encode(), string_to_sign.encode(), digestmod=hashlib.sha256).digest()
+            sign = quote_plus(base64.b64encode(hmac_code))
+            webhook = '{}&timestamp={}&sign={}'.format(webhook, str(timestamp), sign)
+        self.webhook = webhook
+        self.pc_slide = pc_slide
+
+    def msg_open_type(self, url):
+        """
+        消息链接的打开方式
+        1、默认或不设置时，为浏览器打开：pc_slide=False
+        2、在PC端侧边栏打开：pc_slide=True
+        """
+        encode_url = quote_plus(url)
+        if self.pc_slide:
+            final_link = 'dingtalk://dingtalkclient/page/link?url={}&pc_slide=true'.format(encode_url)
+        else:
+            final_link = 'dingtalk://dingtalkclient/page/link?url={}&pc_slide=false'.format(encode_url)
+        return final_link        
 
     def send_text(self, msg, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[]):
         """
@@ -82,7 +115,7 @@ class DingtalkChatbot(object):
     def send_image(self, pic_url):
         """
         image类型（表情）
-        :param pic_url: 图片表情链接
+        :param pic_url: 图片链接
         :return: 返回消息发送结果
         """
         if is_not_null_and_blank_str(pic_url):
@@ -108,14 +141,14 @@ class DingtalkChatbot(object):
         :return: 返回消息发送结果
 
         """
-        if is_not_null_and_blank_str(title) and is_not_null_and_blank_str(text) and is_not_null_and_blank_str(message_url):
+        if all(map(is_not_null_and_blank_str, [title, text, message_url])):
             data = {
                     "msgtype": "link",
                     "link": {
                         "text": text,
                         "title": title,
                         "picUrl": pic_url,
-                        "messageUrl": message_url
+                        "messageUrl": self.msg_open_type(message_url)
                     }
             }
             logging.debug('link类型：%s' % data)
@@ -134,7 +167,9 @@ class DingtalkChatbot(object):
         :param at_dingtalk_ids: 被@人的dingtalkId（可选）
         :return: 返回消息发送结果
         """
-        if is_not_null_and_blank_str(title) and is_not_null_and_blank_str(text):
+        if all(map(is_not_null_and_blank_str, [title, text])):
+            # 给Mardown文本消息中的跳转链接添加上跳转方式
+            text = re.sub(r'(?<!!)\[.*?\]\((.*?)\)', lambda m: m.group(0).replace(m.group(1), self.msg_open_type(m.group(1))), text)
             data = {
                 "msgtype": "markdown",
                 "markdown": {
@@ -168,26 +203,42 @@ class DingtalkChatbot(object):
         """
         if isinstance(action_card, ActionCard):
             data = action_card.get_data()
+            
+            if "singleURL" in data["actionCard"]:
+                data["actionCard"]["singleURL"] = self.msg_open_type(data["actionCard"]["singleURL"])
+            elif "btns" in data["actionCard"]:
+                for btn in data["actionCard"]["btns"]:
+                    btn["actionURL"] = self.msg_open_type(btn["actionURL"])
+            
             logging.debug("ActionCard类型：%s" % data)
             return self.post(data)
         else:
-            logging.error("ActionCard类型：传入的实例类型不正确！")
-            raise TypeError("ActionCard类型：传入的实例类型不正确！")
+            logging.error("ActionCard类型：传入的实例类型不正确，内容为：{}".format(str(action_card)))
+            raise TypeError("ActionCard类型：传入的实例类型不正确，内容为：{}".format(str(action_card)))
 
     def send_feed_card(self, links):
         """
         FeedCard类型
-        :param links: 信息集（FeedLink数组）
+        :param links: FeedLink实例列表 or CardItem实例列表
         :return: 返回消息发送结果
         """
-        link_data_list = []
+        if not isinstance(links, list):
+            logging.error("FeedLink类型：传入的数据格式不正确，内容为：{}".format(str(links)))
+            raise ValueError("FeedLink类型：传入的数据格式不正确，内容为：{}".format(str(links)))
+        
+        link_list = []
         for link in links:
+            # 兼容：1、传入FeedLink实例列表；2、CardItem实例列表；
             if isinstance(link, FeedLink) or isinstance(link, CardItem):
-                link_data_list.append(link.get_data())
-        if link_data_list:
-            # 兼容：1、传入FeedLink或CardItem实例列表；2、传入数据字典列表；
-            links = link_data_list
-        data = {"msgtype": "feedCard", "feedCard": {"links": links}}
+                link = link.get_data()
+                link['messageURL'] = self.msg_open_type(link['messageURL'])
+                link_list.append(link)
+            else:
+                logging.error("FeedLink类型，传入的数据格式不正确，内容为：{}".format(str(link)))
+                raise ValueError("FeedLink类型，传入的数据格式不正确，内容为：{}".format(str(link)))
+
+        
+        data = {"msgtype": "feedCard", "feedCard": {"links": link_list}}
         logging.debug("FeedCard类型：%s" % data)
         return self.post(data)
 
@@ -265,7 +316,7 @@ class ActionCard(object):
         获取ActionCard类型消息数据（字典）
         :return: 返回ActionCard数据
         """
-        if is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.text) and len(self.btns):
+        if all(map(is_not_null_and_blank_str, [self.title, self.text])) and len(self.btns):
             if len(self.btns) == 1:
                 # 整体跳转ActionCard类型
                 data = {
@@ -319,7 +370,7 @@ class FeedLink(object):
         获取FeedLink消息数据（字典）
         :return: 本FeedLink消息的数据
         """
-        if is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.message_url) and is_not_null_and_blank_str(self.pic_url):
+        if all(map(is_not_null_and_blank_str, [self.title, self.message_url, self.pic_url])):
             data = {
                     "title": self.title,
                     "messageURL": self.message_url,
@@ -353,7 +404,7 @@ class CardItem(object):
         获取CardItem子控件数据（字典）
         @return: 子控件的数据
         """
-        if is_not_null_and_blank_str(self.pic_url) and is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.url):
+        if all(map(is_not_null_and_blank_str, [self.title, self.url, self.pic_url])):
             # FeedCard类型
             data = {
                 "title": self.title,
@@ -361,7 +412,7 @@ class CardItem(object):
                 "picURL": self.pic_url
             }
             return data
-        elif is_not_null_and_blank_str(self.title) and is_not_null_and_blank_str(self.url):
+        elif all(map(is_not_null_and_blank_str, [self.title, self.url])):
             # ActionCard类型
             data = {
                 "title": self.title,

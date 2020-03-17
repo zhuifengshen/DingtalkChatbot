@@ -11,7 +11,7 @@
 
 3、机器人支持Webhook自定义接入，就可以实现更多可能性，例如：将运维报警、自动化测试结果报告、工作&生活日程安排（上班打卡、下班吃饭、健身、读书、生日、纪念日...）的提醒；
 
-目前自定义机器人支持文本（text）、链接（link）、markdown三种消息格式，五种消息类型，详细信息请参考\ `自定义机器人官方文档 <https://open-doc.dingtalk.com/docs/doc.htm?spm=0.0.0.0.0Sds7z&treeId=257&articleId=105733&docType=1>`__
+目前自定义机器人支持文本（text）、链接（link）、markdown三种消息格式，五种消息类型，详细信息请参考\ `自定义机器人官方文档 <https://ding-doc.dingtalk.com/doc#/serverapi2/qf2nxq>`__
 
 二、安装使用
 ============
@@ -48,7 +48,7 @@
 -  支持消息发送失败时自动通知；
 -  支持Python2、Python3；
 -  支持钉钉官方消息发送频率限制限制：每个机器人每分钟最多发送20条；
--  支持钉钉开放平台之企业内部\ `自定义outgoing机器人消息发送 <https://open-doc.dingtalk.com/doc.htm#?docType=1&docId=108063&previewCode=BA089C5628865CADD5A760C40D515181>`__；
+-  支持钉钉开放平台之企业内部\ `自定义outgoing机器人消息发送 <https://ding-doc.dingtalk.com/doc#/serverapi2/elzz1p>`__；
 
 三、各消息类型使用示例
 ======================

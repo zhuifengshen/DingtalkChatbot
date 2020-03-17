@@ -13,7 +13,7 @@ class TestDingtalkChatbot(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.webhook = 'https://oapi.dingtalk.com/robot/send?access_token=52d9034cc78680bc0d4ba6a65748e77fa7b96ee43d57b96116910606f7863d59'
+        cls.webhook = 'https://dingtalk.com/robot/send?access_token=52d9034cc78680bc0d4ba6a65748e77fa7b96ee43d57b96116910606f7863d59'
         cls.xiaoding = DingtalkChatbot(cls.webhook)
 
     def test_is_not_null_and_blank_str(self):

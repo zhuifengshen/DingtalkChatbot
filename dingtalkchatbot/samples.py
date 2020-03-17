@@ -9,35 +9,62 @@ from dingtalkchatbot.chatbot import DingtalkChatbot, ActionCard, FeedLink, CardI
 
 logging.basicConfig(level=logging.DEBUG)
 
+
+# def mini_sample():
+#     webhook = 'https://oapi.dingtalk.com/robot/send?access_token=这里填写自己钉钉群自定义机器人的token'
+#     at_mobiles = ['这里填写需要提醒的用户的手机号码，字符串或数字都可以']
+#     headers = {'Content-Type': 'application/json; charset=utf-8'}
+#     post_data = {
+#         'msgtype': 'text',
+#         'text': {
+#             'content': '我就是小丁，小丁就是我！'
+#         },
+#         'at': {
+#             'atMobiles': at_mobiles,
+#             'isAtAll': False
+#         }
+#     }
+#     r = requests.post(webhook, headers=headers, data=json.dumps(post_data))
+#     print(r.content)  # 输出消息发送结果
+
+
 if __name__ == '__main__':
     # *************************************这里填写自己钉钉群自定义机器人的token*****************************************
-    webhook = 'https://oapi.dingtalk.com/robot/send?access_token=52d9034cc78680bc0d4ba6a65748e77fa7b96ee43d57b96116910606f7863d59'
+    # 一、旧版的钉钉自定义机器人（无需安全设置）
+    old_webhook = 'https://oapi.dingtalk.com/robot/send?access_token=77eb420ff2761ad516d974e1428c3e198b84faabc9c9ef8e86b2c71ac60bd0ea'
+    # 二、新版的钉钉自定义机器人必须配置安全设置（自定义关键字、加签、IP地址/段），其中“加签”需要传入密钥才能发送成功
+    new_webhook = 'https://oapi.dingtalk.com/robot/send?access_token=aa62d3aa55cd785609d1de1b8c82ebc0d5a106aa5983833ed15023cef80db7fa'
+    secret = 'SEC11b94b27f5953b94deee33840d2863ebfbe7c75b68848613cdbd80228752d63b'  # 创建机器人时钉钉设置页面有提供
     # 用户手机号列表
     at_mobiles = ['*************************这里填写需要提醒的用户的手机号码，字符串或数字都可以****************************']
     # 初始化机器人小丁
-    xiaoding = DingtalkChatbot(webhook)
+    # xiaoding = DingtalkChatbot(old_webhook)  # 旧版初始化方式
+    xiaoding = DingtalkChatbot(new_webhook, secret=secret, pc_slide=True)  # 新版安全设置为“加签”时，需要传入请求密钥
     # text
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', is_at_all=True)
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', at_mobiles=at_mobiles)
 
     # image表情
-    xiaoding.send_image(pic_url='http://uc-test-manage-00.umlife.net/jenkins/pic/flake8.png')
+    xiaoding.send_image(pic_url='http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg')
 
     # link
-    xiaoding.send_link(title='万万没想到，某小璐竟然...', text='故事是这样子的...', message_url='http://www.kwongwah.com.my/?p=454748", pic_url="https://pbs.twimg.com/media/CEwj7EDWgAE5eIF.jpg')
+    xiaoding.send_link(title='万万没想到，某小璐竟然...',
+                       text='故事是这样子的...',
+                       message_url='http://www.kwongwah.com.my/?p=454748', 
+                       pic_url='https://pbs.twimg.com/media/CEwj7EDWgAE5eIF.jpg')
 
     # markdown
     # 1、提醒所有人
     xiaoding.send_markdown(title='氧气文字', text='#### 广州天气\n'
                            '> 9度，西北风1级，空气良89，相对温度73%\n\n'
                            '> ![美景](http://www.sinaimg.cn/dy/slidenews/5_img/2013_28/453_28488_469248.jpg)\n'
-                           '> ###### 10点20分发布 [天气](http://www.thinkpage.cn/) \n',
+                           '> ###### 10点20分发布 [天气](https://www.seniverse.com/) \n',
                            is_at_all=True)
     # 2、提醒指定手机用户，需要在text参数中@用户
     xiaoding.send_markdown(title='氧气文字', text='#### 广州天气\n'
                            '> 9度，西北风1级，空气良89，相对温度73%\n\n'
                            '> ![美景](http://www.sinaimg.cn/dy/slidenews/5_img/2013_28/453_28488_469248.jpg)\n'
-                           '> ###### 10点20分发布 [天气](http://www.thinkpage.cn/) \n',
+                           '> ###### 10点20分发布 [天气信息](https://www.seniverse.com/) \n',
                            at_mobiles=at_mobiles)
 
     # 整体跳转ActionCard
@@ -68,26 +95,8 @@ if __name__ == '__main__':
     xiaoding.send_action_card(actioncard3)
 
     # FeedCard类型
-    card1 = CardItem(title="氧气美女", url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
-    card2 = CardItem(title="氧眼美女", url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
-    card3 = CardItem(title="氧神美女", url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
+    card1 = CardItem(title="氧气美女", url="https://www.baidu.com/", pic_url="http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg")
+    card2 = CardItem(title="氧眼美女", url="https://www.baidu.com/", pic_url="http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg")
+    card3 = CardItem(title="氧神美女", url="https://www.baidu.com/", pic_url="http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg")
     cards = [card1, card2, card3]
     xiaoding.send_feed_card(cards)
-
-
-# def mini_sample():
-#     webhook = 'https://oapi.dingtalk.com/robot/send?access_token=这里填写自己钉钉群自定义机器人的token'
-#     at_mobiles = ['这里填写需要提醒的用户的手机号码，字符串或数字都可以']
-#     headers = {'Content-Type': 'application/json; charset=utf-8'}
-#     post_data = {
-#         'msgtype': 'text',
-#         'text': {
-#             'content': '我就是小丁，小丁就是我！'
-#         },
-#         'at': {
-#             'atMobiles': at_mobiles,
-#             'isAtAll': False
-#         }
-#     }
-#     r = requests.post(webhook, headers=headers, data=json.dumps(post_data))
-#     print(r.content)  # 输出消息发送结果
