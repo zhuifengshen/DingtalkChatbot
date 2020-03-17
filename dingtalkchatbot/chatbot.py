@@ -87,7 +87,7 @@ class DingtalkChatbot(object):
         text类型
         :param msg: 消息内容
         :param is_at_all: @所有人时：true，否则为false（可选）
-        :param at_mobiles: 被@人的手机号（可选）
+        :param at_mobiles: 被@人的手机号（注意：在text内容里可以指定@手机号位置，无指定则默认显示在文本末尾，可选）
         :param at_dingtalk_ids: 被@人的dingtalkId（可选）
         :return: 返回消息发送结果
         """
@@ -162,8 +162,8 @@ class DingtalkChatbot(object):
         markdown类型
         :param title: 首屏会话透出的展示内容
         :param text: markdown格式的消息内容
-        :param is_at_all: 被@人的手机号（在text内容里要有@手机号，可选）
-        :param at_mobiles: @所有人时：true，否则为：false（可选）
+        :param is_at_all: @所有人时：true，否则为：false（可选）
+        :param at_mobiles: 被@人的手机号（注意：在text内容里要有@手机号，否则无法@成功，另外@手机号在文本中的位置可自定义，可选）
         :param at_dingtalk_ids: 被@人的dingtalkId（可选）
         :return: 返回消息发送结果
         """
@@ -184,6 +184,8 @@ class DingtalkChatbot(object):
             if at_mobiles:
                 at_mobiles = list(map(str, at_mobiles))
                 data["at"]["atMobiles"] = at_mobiles
+                # mobiles_text = '\n@' + '@'.join(at_mobiles)
+                # data["markdown"]["text"] = text + mobiles_text
 
             if at_dingtalk_ids:
                 at_dingtalk_ids = list(map(str, at_dingtalk_ids))

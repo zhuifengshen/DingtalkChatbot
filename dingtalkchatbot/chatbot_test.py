@@ -13,7 +13,7 @@ class TestDingtalkChatbot(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        cls.webhook = 'https://dingtalk.com/robot/send?access_token=52d9034cc78680bc0d4ba6a65748e77fa7b96ee43d57b96116910606f7863d59'
+        cls.webhook = 'https://oapi.dingtalk.com/robot/send?access_token=77eb420ff2761ad516d974e1428c3e198b84faabc9c9ef8e86b2c71ac60bd0ea'
         cls.xiaoding = DingtalkChatbot(cls.webhook)
 
     def test_is_not_null_and_blank_str(self):
@@ -36,7 +36,7 @@ class TestDingtalkChatbot(unittest.TestCase):
 
     def test_send_link(self):
         """测试发送链接消息函数"""
-        result = self.xiaoding.send_link(title='万万没想到，某小璐竟然...', text='故事是这样子的...', message_url='http://www.kwongwah.com.my/?p=454748", pic_url="https://pbs.twimg.com/media/CEwj7EDWgAE5eIF.jpg')
+        result = self.xiaoding.send_link(title='万万没想到，某小璐竟然...', text='故事是这样子的...', message_url='http://www.kwongwah.com.my/?p=454748', pic_url='https://pbs.twimg.com/media/CEwj7EDWgAE5eIF.jpg')
         self.assertEqual(result['errcode'], 0)
 
     def test_send_markdown(self):
@@ -93,18 +93,18 @@ class TestDingtalkChatbot(unittest.TestCase):
 
     def test_send_feedcard(self):
         """测试发送FeedCard类型消息功能（CardItem新API)"""
-        carditem1 = CardItem(title="氧气美女", url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
-        carditem2 = CardItem(title="氧眼美女", url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
-        carditem3 = CardItem(title="氧神美女", url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
+        carditem1 = CardItem(title="氧气美女", url="https://www.dingtalk.com/", pic_url="http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg")
+        carditem2 = CardItem(title="氧眼美女", url="https://www.dingtalk.com/", pic_url="http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg")
+        carditem3 = CardItem(title="氧神美女", url="https://www.dingtalk.com/", pic_url="http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg")
         cards = [carditem1, carditem2, carditem3]
         result = self.xiaoding.send_feed_card(cards)
         self.assertEqual(result['errcode'], 0)
 
     def test_send_feedcard_old_api(self):
         """测试发送FeedCard类型消息功能(FeedLink旧API)"""
-        feedlink1 = FeedLink(title="氧气美女", message_url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
-        feedlink2 = FeedLink(title="氧眼美女", message_url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
-        feedlink3 = FeedLink(title="氧神美女", message_url="https://www.dingtalk.com/", pic_url="https://unzippedtv.com/wp-content/uploads/sites/28/2016/02/asian.jpg")
+        feedlink1 = FeedLink(title="氧气美女", message_url="https://www.dingtalk.com/", pic_url="http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg")
+        feedlink2 = FeedLink(title="氧眼美女", message_url="https://www.dingtalk.com/", pic_url="http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg")
+        feedlink3 = FeedLink(title="氧神美女", message_url="https://www.dingtalk.com/", pic_url="http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg")
         links = [feedlink1, feedlink2, feedlink3]
         result = self.xiaoding.send_feed_card(links)
         self.assertEqual(result['errcode'], 0)

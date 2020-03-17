@@ -36,15 +36,16 @@ if __name__ == '__main__':
     new_webhook = 'https://oapi.dingtalk.com/robot/send?access_token=aa62d3aa55cd785609d1de1b8c82ebc0d5a106aa5983833ed15023cef80db7fa'
     secret = 'SEC11b94b27f5953b94deee33840d2863ebfbe7c75b68848613cdbd80228752d63b'  # 创建机器人时钉钉设置页面有提供
     # 用户手机号列表
-    at_mobiles = ['*************************这里填写需要提醒的用户的手机号码，字符串或数字都可以****************************']
+    at_mobiles = ['18825166XXX', '被@人的手机号(在text内容里要有@手机号)，位置可自定义']
     # 初始化机器人小丁
     # xiaoding = DingtalkChatbot(old_webhook)  # 旧版初始化方式
-    xiaoding = DingtalkChatbot(new_webhook, secret=secret, pc_slide=True)  # 新版安全设置为“加签”时，需要传入请求密钥
+    # 新版安全设置为“加签”时，需要传入请求密钥，同时支持设置消息链接跳转方式，默认pc_slide=False为跳转到浏览器，pc_slide为在PC端侧边栏打开
+    xiaoding = DingtalkChatbot(new_webhook, secret=secret, pc_slide=True)  
     # text
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', is_at_all=True)
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', at_mobiles=at_mobiles)
 
-    # image表情
+    # # image
     xiaoding.send_image(pic_url='http://pic1.win4000.com/wallpaper/2020-03-11/5e68b0557f3a6.jpg')
 
     # link
@@ -61,10 +62,10 @@ if __name__ == '__main__':
                            '> ###### 10点20分发布 [天气](https://www.seniverse.com/) \n',
                            is_at_all=True)
     # 2、提醒指定手机用户，需要在text参数中@用户
-    xiaoding.send_markdown(title='氧气文字', text='#### 广州天气\n'
+    xiaoding.send_markdown(title='氧气文字', text='#### 广州天气 @18825166XXX\n'
                            '> 9度，西北风1级，空气良89，相对温度73%\n\n'
                            '> ![美景](http://www.sinaimg.cn/dy/slidenews/5_img/2013_28/453_28488_469248.jpg)\n'
-                           '> ###### 10点20分发布 [天气信息](https://www.seniverse.com/) \n',
+                           '> ###### 10点20分发布 [天气信息](https://www.seniverse.com/)\n',
                            at_mobiles=at_mobiles)
 
     # 整体跳转ActionCard

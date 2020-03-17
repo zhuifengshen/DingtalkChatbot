@@ -47,8 +47,10 @@
 -  支持ActionCard消息；
 -  支持消息发送失败时自动通知；
 -  支持Python2、Python3；
+-  支持设置消息链接打开方式（默认pc_slide=False，跳转至浏览器打开，pc_slide=True，则在PC端侧边栏打开）
 -  支持钉钉官方消息发送频率限制限制：每个机器人每分钟最多发送20条；
--  支持钉钉开放平台之企业内部\ `自定义outgoing机器人消息发送 <https://ding-doc.dingtalk.com/doc#/serverapi2/elzz1p>`__；
+-  支持钉钉企业内部机器人\ `自定义outgoing机器人消息发送 <https://ding-doc.dingtalk.com/doc#/serverapi2/elzz1p>`__；
+-  支持最新版钉钉机器人加密设置密钥验证；
 
 三、各消息类型使用示例
 ======================
@@ -60,8 +62,11 @@
     from dingtalkchatbot.chatbot import DingtalkChatbot
     # WebHook地址
     webhook = 'https://oapi.dingtalk.com/robot/send?access_token=这里填写自己钉钉群自定义机器人的token'
+    secret = 'SEC11b9...这里填写自己的加密设置密钥'  # 可选：创建机器人勾选“加签”选项时使用
     # 初始化机器人小丁
-    xiaoding = DingtalkChatbot(webhook)
+    xiaoding = DingtalkChatbot(webhook)  # 方式一：通常初始化方式
+    xiaoding = DingtalkChatbot(webhook, secret=secret)  # 方式二：勾选“加签”选项时使用
+    xiaoding = DingtalkChatbot(webhook, pc_slide=True)  # 方式三：设置消息链接在PC端侧边栏打开
     # Text消息@所有人
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', is_at_all=True)
 
@@ -160,6 +165,16 @@
                                  btn_orientation=1,
                                  hide_avatar=1)
     xiaoding.send_action_card(actioncard3)
+
+
+四、常见注意事项
+===========================
+
+-  1、除了在at_mobiles列表写上手机号，在消息text内容中也要有@手机号，否则无法@成功。因为@手机号的位置可以在文本中自定义，同时支持@多个人，以便突出对应的人去关注对应的内容；
+-  2、图片链接是Http，在网页版钉钉无法正常显示，在客户端则可以，需要更改为使用Https；
+-  3、消息链接打开方式可以在初始化机器人时设置（默认pc_slide=False，跳转至浏览器打开，pc_slide=True，则在PC端侧边栏打开）；
+
+
 
 **哥们，更多使用场景，现在尽情展开想象吧...**
 
