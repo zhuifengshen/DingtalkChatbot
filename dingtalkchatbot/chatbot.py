@@ -82,13 +82,14 @@ class DingtalkChatbot(object):
             final_link = 'dingtalk://dingtalkclient/page/link?url={}&pc_slide=false'.format(encode_url)
         return final_link        
 
-    def send_text(self, msg, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[]):
+    def send_text(self, msg, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[], is_auto_at=True):
         """
         text类型
         :param msg: 消息内容
         :param is_at_all: @所有人时：true，否则为false（可选）
-        :param at_mobiles: 被@人的手机号（注意：在text内容里可以指定@手机号位置，无指定则默认显示在文本末尾，可选）
+        :param at_mobiles: 被@人的手机号（注意：可以在msg内容里自定义@手机号的位置，也支持同时@多个手机号，可选）
         :param at_dingtalk_ids: 被@人的dingtalkId（可选）
+        :param is_auto_at: 是否自动在msg内容末尾添加@手机号，默认自动添加，可设置为False取消（可选）
         :return: 返回消息发送结果
         """
         data = {"msgtype": "text", "at": {}}
@@ -104,6 +105,9 @@ class DingtalkChatbot(object):
         if at_mobiles:
             at_mobiles = list(map(str, at_mobiles))
             data["at"]["atMobiles"] = at_mobiles
+            if is_auto_at:
+                mobiles_text = '\n@' + '@'.join(at_mobiles)
+                data["text"]["content"] = msg + mobiles_text
 
         if at_dingtalk_ids:
             at_dingtalk_ids = list(map(str, at_dingtalk_ids))
@@ -157,14 +161,15 @@ class DingtalkChatbot(object):
             logging.error("link类型中消息标题或内容或链接不能为空！")
             raise ValueError("link类型中消息标题或内容或链接不能为空！")
 
-    def send_markdown(self, title, text, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[]):
+    def send_markdown(self, title, text, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[], is_auto_at=True):
         """
         markdown类型
         :param title: 首屏会话透出的展示内容
         :param text: markdown格式的消息内容
         :param is_at_all: @所有人时：true，否则为：false（可选）
-        :param at_mobiles: 被@人的手机号（注意：在text内容里要有@手机号，否则无法@成功，另外@手机号在文本中的位置可自定义，可选）
+        :param at_mobiles: 被@人的手机号（默认自动添加在text内容末尾，可取消自动化添加改为自定义设置，可选）
         :param at_dingtalk_ids: 被@人的dingtalkId（可选）
+        :param is_auto_at: 是否自动在text内容末尾添加@手机号，默认自动添加，可设置为False取消（可选）        
         :return: 返回消息发送结果
         """
         if all(map(is_not_null_and_blank_str, [title, text])):
@@ -184,8 +189,9 @@ class DingtalkChatbot(object):
             if at_mobiles:
                 at_mobiles = list(map(str, at_mobiles))
                 data["at"]["atMobiles"] = at_mobiles
-                # mobiles_text = '\n@' + '@'.join(at_mobiles)
-                # data["markdown"]["text"] = text + mobiles_text
+                if is_auto_at:
+                    mobiles_text = '\n@' + '@'.join(at_mobiles)
+                    data["markdown"]["text"] = text + mobiles_text
 
             if at_dingtalk_ids:
                 at_dingtalk_ids = list(map(str, at_dingtalk_ids))
