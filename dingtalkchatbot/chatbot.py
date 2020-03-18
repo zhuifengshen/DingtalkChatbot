@@ -4,6 +4,7 @@
 __author__ = 'Devin -- http://zhangchuzhao.site'
 
 import re
+import sys
 import json
 import time
 import logging
@@ -14,9 +15,12 @@ import base64
 import hashlib
 import queue
 
+_ver = sys.version_info
+is_py3 = (_ver[0] == 3)
+
 try:
     quote_plus = urllib.parse.quote_plus
-except ArithmeticError:
+except AttributeError:
     quote_plus = urllib.quote_plus
 
 try:
@@ -60,14 +64,32 @@ class DingtalkChatbot(object):
         super(DingtalkChatbot, self).__init__()
         self.headers = {'Content-Type': 'application/json; charset=utf-8'}
         self.queue = queue.Queue(20)  # 钉钉官方限流每分钟发送20条信息
-        if secret is not None and secret.startswith('SEC'):
-            timestamp = round(time.time() * 1000)
-            string_to_sign = '{}\n{}'.format(timestamp, secret)
-            hmac_code = hmac.new(secret.encode(), string_to_sign.encode(), digestmod=hashlib.sha256).digest()
-            sign = quote_plus(base64.b64encode(hmac_code))
-            webhook = '{}&timestamp={}&sign={}'.format(webhook, str(timestamp), sign)
         self.webhook = webhook
+        self.secret = secret
         self.pc_slide = pc_slide
+        self.start_time = time.time()  # 加签时，请求时间戳与请求时间不能超过1小时，用于定时更新签名
+        if self.secret is not None and self.secret.startswith('SEC'):
+            self.update_webhook()
+            
+    def update_webhook(self):
+        """
+        钉钉群自定义机器人安全设置加签时，签名中的时间戳与请求时不能超过一个小时，所以每个1小时需要更新签名
+        """
+        if is_py3:
+            timestamp = round(self.start_time * 1000)
+            string_to_sign = '{}\n{}'.format(timestamp, self.secret)
+            hmac_code = hmac.new(self.secret.encode(), string_to_sign.encode(), digestmod=hashlib.sha256).digest()            
+        else:
+            timestamp = long(round(self.start_time * 1000))
+            secret_enc = bytes(self.secret).encode('utf-8')
+            string_to_sign = '{}\n{}'.format(timestamp, self.secret)
+            string_to_sign_enc = bytes(string_to_sign).encode('utf-8')
+            hmac_code = hmac.new(secret_enc, string_to_sign_enc, digestmod=hashlib.sha256).digest()
+        
+        sign = quote_plus(base64.b64encode(hmac_code))
+        self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook, str(timestamp), sign)
+                
+
 
     def msg_open_type(self, url):
         """
@@ -256,14 +278,14 @@ class DingtalkChatbot(object):
         :param data: 消息数据（字典）
         :return: 返回发送结果
         """
-        # self.times += 1
-        # if self.times % 20 == 0:  # 这种限流存在缺陷，比如后面19集中在最后59秒发送，那么接下来就容易出现问题
-        #     if time.time() - self.start_time < 60:
-        #         logging.debug('钉钉官方限制每个机器人每分钟最多发送20条，当前消息发送频率已达到限制条件，休眠一分钟')
-        #         time.sleep(60)
-        #     self.start_time = time.time()
-
         now = time.time()
+        
+        # 钉钉自定义机器人安全设置加签时，签名中的时间戳与请求时不能超过一个小时，所以每个1小时需要更新签名
+        if now - self.start_time >= 3600 and self.secret is not None and self.secret.startswith('SEC'):
+            self.start_time = now
+            self.update_webhook()
+
+        # 钉钉自定义机器人现在每分钟最多发送20条消息
         self.queue.put(now)
         if self.queue.full():
             elapse_time = now - self.queue.get()
@@ -272,8 +294,8 @@ class DingtalkChatbot(object):
                 logging.debug('钉钉官方限制机器人每分钟最多发送20条，当前发送频率已达限制条件，休眠 {}s'.format(str(sleep_time)))
                 time.sleep(sleep_time)
 
-        post_data = json.dumps(data)
         try:
+            post_data = json.dumps(data)
             response = requests.post(self.webhook, headers=self.headers, data=post_data)
         except requests.exceptions.HTTPError as exc:
             logging.error("消息发送失败， HTTP error: %d, reason: %s" % (exc.response.status_code, exc.response.reason))
