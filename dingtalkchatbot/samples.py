@@ -61,12 +61,12 @@ if __name__ == '__main__':
                            '> ![美景](http://www.sinaimg.cn/dy/slidenews/5_img/2013_28/453_28488_469248.jpg)\n'
                            '> ###### 10点20分发布 [天气](https://www.seniverse.com/) \n',
                            is_at_all=True)
-    # 2、提醒指定手机用户，需要在text参数中@用户
+    # 2、提醒指定手机用户，并在text内容中自定义”@用户“的位置
     xiaoding.send_markdown(title='氧气文字', text='#### 广州天气 @18825166XXX\n'
                            '> 9度，西北风1级，空气良89，相对温度73%\n\n'
                            '> ![美景](http://www.sinaimg.cn/dy/slidenews/5_img/2013_28/453_28488_469248.jpg)\n'
                            '> ###### 10点20分发布 [天气信息](https://www.seniverse.com/)\n',
-                           at_mobiles=at_mobiles)
+                           at_mobiles=at_mobiles, is_auto_at=False)
 
     # 整体跳转ActionCard
     btns1 = [CardItem(title="查看详情", url="https://www.dingtalk.com/")]
