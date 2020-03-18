@@ -12,6 +12,7 @@ import urllib
 import hmac
 import base64
 import hashlib
+import queue
 
 try:
     quote_plus = urllib.parse.quote_plus
@@ -58,10 +59,9 @@ class DingtalkChatbot(object):
         """
         super(DingtalkChatbot, self).__init__()
         self.headers = {'Content-Type': 'application/json; charset=utf-8'}
-        self.times = 0
-        self.start_time = time.time()
+        self.queue = queue.Queue(20)  # 钉钉官方限流每分钟发送20条信息
         if secret is not None and secret.startswith('SEC'):
-            timestamp = round(self.start_time * 1000)
+            timestamp = round(time.time() * 1000)
             string_to_sign = '{}\n{}'.format(timestamp, secret)
             hmac_code = hmac.new(secret.encode(), string_to_sign.encode(), digestmod=hashlib.sha256).digest()
             sign = quote_plus(base64.b64encode(hmac_code))
@@ -256,12 +256,21 @@ class DingtalkChatbot(object):
         :param data: 消息数据（字典）
         :return: 返回发送结果
         """
-        self.times += 1
-        if self.times % 20 == 0:
-            if time.time() - self.start_time < 60:
-                logging.debug('钉钉官方限制每个机器人每分钟最多发送20条，当前消息发送频率已达到限制条件，休眠一分钟')
-                time.sleep(60)
-            self.start_time = time.time()
+        # self.times += 1
+        # if self.times % 20 == 0:  # 这种限流存在缺陷，比如后面19集中在最后59秒发送，那么接下来就容易出现问题
+        #     if time.time() - self.start_time < 60:
+        #         logging.debug('钉钉官方限制每个机器人每分钟最多发送20条，当前消息发送频率已达到限制条件，休眠一分钟')
+        #         time.sleep(60)
+        #     self.start_time = time.time()
+
+        now = time.time()
+        self.queue.put(now)
+        if self.queue.full():
+            elapse_time = now - self.queue.get()
+            if elapse_time < 60:
+                sleep_time = int(60 - elapse_time) + 1
+                logging.debug('钉钉官方限制机器人每分钟最多发送20条，当前发送频率已达限制条件，休眠 {}s'.format(str(sleep_time)))
+                time.sleep(sleep_time)
 
         post_data = json.dumps(data)
         try:

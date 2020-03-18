@@ -7,7 +7,7 @@ import logging
 import requests
 from dingtalkchatbot.chatbot import DingtalkChatbot, ActionCard, FeedLink, CardItem
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.ERROR)
 
 
 # def mini_sample():
