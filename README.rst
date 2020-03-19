@@ -32,11 +32,12 @@
 由于各种消息调用，官方只提供Java语言的封装，平时使用Python比较多，为了更方便平时自动化项目的使用，周末花了点时间用Python语言对各种消息类型进行了一一封装，代码已开源在GitHub上，同时也上传了PyPI。
 
 | 1、项目源码地址如下：\ `DingtalkChatbot <https://github.com/zhuifengshen/DingtalkChatbot>`__
-| 2、安装命令如下：
+| 2、安装和更新命令如下：
 
 ::
 
     pip install DingtalkChatbot
+    pip install -U DingtalkChatbot
 
 3、支持功能如下：
 
@@ -65,8 +66,8 @@
     secret = 'SEC11b9...这里填写自己的加密设置密钥'  # 可选：创建机器人勾选“加签”选项时使用
     # 初始化机器人小丁
     xiaoding = DingtalkChatbot(webhook)  # 方式一：通常初始化方式
-    xiaoding = DingtalkChatbot(webhook, secret=secret)  # 方式二：勾选“加签”选项时使用
-    xiaoding = DingtalkChatbot(webhook, pc_slide=True)  # 方式三：设置消息链接在PC端侧边栏打开
+    xiaoding = DingtalkChatbot(webhook, secret=secret)  # 方式二：勾选“加签”选项时使用（v1.5以上新功能）
+    xiaoding = DingtalkChatbot(webhook, pc_slide=True)  # 方式三：设置消息链接在PC端侧边栏打开（v1.5以上新功能）
     # Text消息@所有人
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', is_at_all=True)
 
