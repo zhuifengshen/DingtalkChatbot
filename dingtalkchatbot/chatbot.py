@@ -65,6 +65,7 @@ class DingtalkChatbot(object):
         self.headers = {'Content-Type': 'application/json; charset=utf-8'}
         self.queue = queue.Queue(20)  # 钉钉官方限流每分钟发送20条信息
         self.webhook = webhook
+        self.post_webhook = webhook
         self.secret = secret
         self.pc_slide = pc_slide
         self.start_time = time.time()  # 加签时，请求时间戳与请求时间不能超过1小时，用于定时更新签名
@@ -87,7 +88,7 @@ class DingtalkChatbot(object):
             hmac_code = hmac.new(secret_enc, string_to_sign_enc, digestmod=hashlib.sha256).digest()
         
         sign = quote_plus(base64.b64encode(hmac_code))
-        self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook, str(timestamp), sign)
+        self.post_webhook = '{}&timestamp={}&sign={}'.format(self.webhook, str(timestamp), sign)
                 
 
 
@@ -296,7 +297,7 @@ class DingtalkChatbot(object):
 
         try:
             post_data = json.dumps(data)
-            response = requests.post(self.webhook, headers=self.headers, data=post_data)
+            response = requests.post(self.post_webhook, headers=self.headers, data=post_data)
         except requests.exceptions.HTTPError as exc:
             logging.error("消息发送失败， HTTP error: %d, reason: %s" % (exc.response.status_code, exc.response.reason))
             raise
@@ -320,7 +321,7 @@ class DingtalkChatbot(object):
                 if result['errcode']:
                     error_data = {"msgtype": "text", "text": {"content": "钉钉机器人消息发送失败，原因：%s" % result['errmsg']}, "at": {"isAtAll": True}}
                     logging.error("消息发送失败，自动通知：%s" % error_data)
-                    requests.post(self.webhook, headers=self.headers, data=json.dumps(error_data))
+                    requests.post(self.post_webhook, headers=self.headers, data=json.dumps(error_data))
                 return result
 
 
