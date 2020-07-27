@@ -37,10 +37,15 @@ if __name__ == '__main__':
     secret = 'SEC11b94b27f5953b94deee33840d2863ebfbe7c75b68848613cdbd80228752d63b'  # 创建机器人时钉钉设置页面有提供
     # 用户手机号列表
     at_mobiles = ['18825166XXX', '这里填@的人的手机号，可自定义@的位置，默认添加在消息末尾']
+    
     # 初始化机器人小丁
     # xiaoding = DingtalkChatbot(old_webhook)  # 旧版初始化方式
-    # 新版安全设置为“加签”时，需要传入请求密钥，同时支持设置消息链接跳转方式，默认pc_slide=False为跳转到浏览器，pc_slide为在PC端侧边栏打开
-    xiaoding = DingtalkChatbot(new_webhook, secret=secret, pc_slide=True)  
+    
+    # 新版安全设置为“加签”时，需要传入请求密钥
+    # 同时支持设置消息链接跳转方式，默认pc_slide=False为跳转到浏览器，pc_slide为在PC端侧边栏打开
+    # 同时支持设置消息发送失败时提醒，默认fail_notice为false不提醒，开发者可以根据返回的消息发送结果自行判断和处理
+    xiaoding = DingtalkChatbot(new_webhook, secret=secret, pc_slide=True, fail_notice=False)
+    
     # text
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', is_at_all=True)
     xiaoding.send_text(msg='我就是小丁，小丁就是我！', at_mobiles=at_mobiles)

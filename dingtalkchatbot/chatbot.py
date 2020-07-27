@@ -54,12 +54,13 @@ class DingtalkChatbot(object):
     """
     钉钉群自定义机器人（每个机器人每分钟最多发送20条），支持文本（text）、连接（link）、markdown三种消息类型！
     """
-    def __init__(self, webhook, secret=None, pc_slide=False):
+    def __init__(self, webhook, secret=None, pc_slide=False, fail_notice=False):
         """
         机器人初始化
         :param webhook: 钉钉群自定义机器人webhook地址
         :param secret: 机器人安全设置页面勾选“加签”时需要传入的密钥
         :param pc_slide: 消息链接打开方式，默认False为浏览器打开，设置为True时为PC端侧边栏打开
+        :param fail_notice: 消息发送失败提醒，默认为False不提醒，开发者可以根据返回的消息发送结果自行判断和处理
         """
         super(DingtalkChatbot, self).__init__()
         self.headers = {'Content-Type': 'application/json; charset=utf-8'}
@@ -67,6 +68,7 @@ class DingtalkChatbot(object):
         self.webhook = webhook
         self.secret = secret
         self.pc_slide = pc_slide
+        self.fail_notice = fail_notice
         self.start_time = time.time()  # 加签时，请求时间戳与请求时间不能超过1小时，用于定时更新签名
         if self.secret is not None and self.secret.startswith('SEC'):
             self.update_webhook()
@@ -276,7 +278,7 @@ class DingtalkChatbot(object):
         """
         发送消息（内容UTF-8编码）
         :param data: 消息数据（字典）
-        :return: 返回发送结果
+        :return: 返回消息发送结果
         """
         now = time.time()
         
@@ -317,8 +319,19 @@ class DingtalkChatbot(object):
                 return {'errcode': 500, 'errmsg': '服务器响应异常'}
             else:
                 logging.debug('发送结果：%s' % result)
-                if result['errcode']:
-                    error_data = {"msgtype": "text", "text": {"content": "钉钉机器人消息发送失败，原因：%s" % result['errmsg']}, "at": {"isAtAll": True}}
+                # 消息发送失败提醒（errcode 不为 0，表示消息发送异常），默认不提醒，开发者可以根据返回的消息发送结果自行判断和处理
+                if self.fail_notice and result.get('errcode', True):
+                    time_now = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(time.time()))
+                    error_data = {
+                      "msgtype": "text",
+                      "text": {
+                        "content": "[注意-自动通知]钉钉机器人消息发送失败，时间：%s，原因：%s，请及时跟进，谢谢!" % (
+                          time_now, result['errmsg'] if result.get('errmsg', False) else '未知异常')
+                        },
+                      "at": {
+                        "isAtAll": False
+                        }
+                      }
                     logging.error("消息发送失败，自动通知：%s" % error_data)
                     requests.post(self.webhook, headers=self.headers, data=json.dumps(error_data))
                 return result

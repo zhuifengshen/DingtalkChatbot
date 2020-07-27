@@ -46,10 +46,10 @@
 -  支持image表情消息；
 -  支持Markdown消息；
 -  支持ActionCard消息；
--  支持消息发送失败时自动通知；
--  支持Python2、Python3；
+-  支持消息发送失败时自动通知（默认fail_notice=False不通知，开发者可以根据返回的消息发送结果自行判断和处理）
 -  支持设置消息链接打开方式（默认pc_slide=False，跳转至浏览器打开，pc_slide=True，则在PC端侧边栏打开）
 -  支持钉钉官方消息发送频率限制限制：每个机器人每分钟最多发送20条；
+-  支持Python2、Python3；
 -  支持钉钉企业内部机器人\ `自定义outgoing机器人消息发送 <https://ding-doc.dingtalk.com/doc#/serverapi2/elzz1p>`__；
 -  支持最新版钉钉机器人加密设置密钥验证；
 
