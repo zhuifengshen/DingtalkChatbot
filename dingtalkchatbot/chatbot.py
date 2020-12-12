@@ -437,6 +437,9 @@ class FeedLink(object):
 class CardItem(object):
     """
     ActionCard和FeedCard消息类型中的子控件
+    注意：
+    1、发送FeedCard消息时，参数pic_url必须传入参数值；
+    2、发送ActionCard消息时，参数pic_url不需要传入参数值；
     """
 
     def __init__(self, title, url, pic_url=None):
