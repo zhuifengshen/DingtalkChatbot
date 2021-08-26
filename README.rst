@@ -60,7 +60,7 @@
 
 .. code:: python
 
-    from dingtalkchatbot.chatbot import DingtalkChatbot
+    from dingtalkchatbot.chatbot import DingtalkChatbot, ActionCard, CardItem
     # WebHook地址
     webhook = 'https://oapi.dingtalk.com/robot/send?access_token=这里填写自己钉钉群自定义机器人的token'
     secret = 'SEC11b9...这里填写自己的加密设置密钥'  # 可选：创建机器人勾选“加签”选项时使用
@@ -111,7 +111,7 @@
 .. code:: python
 
         # Markdown消息@指定用户
-        xiaoding.send_markdown(title='氧气文字', text='#### 广州天气 @18825166128\n'
+        xiaoding.send_markdown(title='氧气文字', text='#### 广州天气 @1882516xxxx\n'
                                '> 9度，西北风1级，空气良89，相对温度73%\n\n'
                                '> ![美景](http://www.sinaimg.cn/dy/slidenews/5_img/2013_28/453_28488_469248.jpg)\n'
                                '> ###### 10点20分发布 [天气](http://www.thinkpage.cn/) \n',
