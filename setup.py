@@ -6,6 +6,14 @@ import sys
 from shutil import rmtree
 from setuptools import setup, find_packages, Command
 
+"""
+打包步骤：
+1、功能逻辑编码和测试完成；
+2、更新 __about__.py 中版本号；
+3、提交代码至仓库；
+4、构建打包：python setup.py upload
+"""
+
 about = {}
 here = os.path.abspath(os.path.dirname(__file__))
 
