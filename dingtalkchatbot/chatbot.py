@@ -89,9 +89,10 @@ class DingtalkChatbot(object):
             hmac_code = hmac.new(secret_enc, string_to_sign_enc, digestmod=hashlib.sha256).digest()
         
         sign = quote_plus(base64.b64encode(hmac_code))
-        self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook, str(timestamp), sign)
-                
-
+        if 'timestamp'in self.webhook:
+            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook[:self.webhook.find('&timestamp')], str(timestamp), sign)
+        else:
+            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook, str(timestamp), sign)
 
     def msg_open_type(self, url):
         """
@@ -437,6 +438,7 @@ class FeedLink(object):
 class CardItem(object):
     """
     ActionCard和FeedCard消息类型中的子控件
+    
     注意：
     1、发送FeedCard消息时，参数pic_url必须传入参数值；
     2、发送ActionCard消息时，参数pic_url不需要传入参数值；
