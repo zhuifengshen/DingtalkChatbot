@@ -136,7 +136,7 @@ class DingtalkChatbot(object):
 
         if at_dingtalk_ids:
             at_dingtalk_ids = list(map(str, at_dingtalk_ids))
-            data["at"]["atDingtalkIds"] = at_dingtalk_ids
+            data["at"]["atUserIds"] = at_dingtalk_ids
 
         logging.debug('text类型：%s' % data)
         return self.post(data)
