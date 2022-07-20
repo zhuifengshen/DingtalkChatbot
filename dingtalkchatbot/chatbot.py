@@ -90,9 +90,9 @@ class DingtalkChatbot(object):
         
         sign = quote_plus(base64.b64encode(hmac_code))
         if 'timestamp'in self.webhook:
-            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook[:self.webhook.find('&timestamp')], str(timestamp), sign)  # 更新时间戳
+            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook[:self.webhook.find('&timestamp')], str(timestamp), sign)
         else:
-            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook, str(timestamp), sign)  # 首次初始化
+            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook, str(timestamp), sign)
 
     def msg_open_type(self, url):
         """
@@ -107,7 +107,7 @@ class DingtalkChatbot(object):
             final_link = 'dingtalk://dingtalkclient/page/link?url={}&pc_slide=false'.format(encode_url)
         return final_link        
 
-    def send_text(self, msg, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[], is_auto_at=True):
+    def send_text(self, msg, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[], is_auto_at=True, verify=True):
         """
         text类型
         :param msg: 消息内容
@@ -139,12 +139,13 @@ class DingtalkChatbot(object):
             data["at"]["atDingtalkIds"] = at_dingtalk_ids
 
         logging.debug('text类型：%s' % data)
-        return self.post(data)
+        return self.post(data, verify)
 
-    def send_image(self, pic_url):
+    def send_image(self, pic_url, verify=True):
         """
         image类型（表情）
         :param pic_url: 图片链接
+        :param verify: 是否校验证书，默认校验
         :return: 返回消息发送结果
         """
         if is_not_null_and_blank_str(pic_url):
@@ -155,18 +156,19 @@ class DingtalkChatbot(object):
                 }
             }
             logging.debug('image类型：%s' % data)
-            return self.post(data)
+            return self.post(data, verify)
         else:
             logging.error("image类型中图片链接不能为空！")
             raise ValueError("image类型中图片链接不能为空！")
 
-    def send_link(self, title, text, message_url, pic_url=''):
+    def send_link(self, title, text, message_url, pic_url='', verify=True):
         """
         link类型
         :param title: 消息标题
         :param text: 消息内容（如果太长自动省略显示）
         :param message_url: 点击消息触发的URL
         :param pic_url: 图片URL（可选）
+        :param verify: 是否校验证书，默认校验
         :return: 返回消息发送结果
 
         """
@@ -181,12 +183,12 @@ class DingtalkChatbot(object):
                     }
             }
             logging.debug('link类型：%s' % data)
-            return self.post(data)
+            return self.post(data, verify)
         else:
             logging.error("link类型中消息标题或内容或链接不能为空！")
             raise ValueError("link类型中消息标题或内容或链接不能为空！")
 
-    def send_markdown(self, title, text, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[], is_auto_at=True):
+    def send_markdown(self, title, text, is_at_all=False, at_mobiles=[], at_dingtalk_ids=[], is_auto_at=True, verify=True):
         """
         markdown类型
         :param title: 首屏会话透出的展示内容
@@ -195,6 +197,7 @@ class DingtalkChatbot(object):
         :param at_mobiles: 被@人的手机号（默认自动添加在text内容末尾，可取消自动化添加改为自定义设置，可选）
         :param at_dingtalk_ids: 被@人的dingtalkId（可选）
         :param is_auto_at: 是否自动在text内容末尾添加@手机号，默认自动添加，可设置为False取消（可选）        
+        :param verify: 是否校验证书，默认校验
         :return: 返回消息发送结果
         """
         if all(map(is_not_null_and_blank_str, [title, text])):
@@ -223,15 +226,16 @@ class DingtalkChatbot(object):
                 data["at"]["atDingtalkIds"] = at_dingtalk_ids
 
             logging.debug("markdown类型：%s" % data)
-            return self.post(data)
+            return self.post(data, verify)
         else:
             logging.error("markdown类型中消息标题或内容不能为空！")
             raise ValueError("markdown类型中消息标题或内容不能为空！")
 
-    def send_action_card(self, action_card):
+    def send_action_card(self, action_card, verify=True):
         """
         ActionCard类型
         :param action_card: 整体跳转ActionCard类型实例或独立跳转ActionCard类型实例
+        :param verify: 是否校验证书，默认校验
         :return: 返回消息发送结果
         """
         if isinstance(action_card, ActionCard):
@@ -244,15 +248,16 @@ class DingtalkChatbot(object):
                     btn["actionURL"] = self.msg_open_type(btn["actionURL"])
             
             logging.debug("ActionCard类型：%s" % data)
-            return self.post(data)
+            return self.post(data, verify)
         else:
             logging.error("ActionCard类型：传入的实例类型不正确，内容为：{}".format(str(action_card)))
             raise TypeError("ActionCard类型：传入的实例类型不正确，内容为：{}".format(str(action_card)))
 
-    def send_feed_card(self, links):
+    def send_feed_card(self, links, verify=True):
         """
         FeedCard类型
         :param links: FeedLink实例列表 or CardItem实例列表
+        :param verify: 是否校验证书，默认校验
         :return: 返回消息发送结果
         """
         if not isinstance(links, list):
@@ -273,7 +278,7 @@ class DingtalkChatbot(object):
         
         data = {"msgtype": "feedCard", "feedCard": {"links": link_list}}
         logging.debug("FeedCard类型：%s" % data)
-        return self.post(data)
+        return self.post(data, verify)
 
     def post(self, data, verify=True):
         """
@@ -335,7 +340,7 @@ class DingtalkChatbot(object):
                         }
                       }
                     logging.error("消息发送失败，自动通知：%s" % error_data)
-                    requests.post(self.webhook, headers=self.headers, data=json.dumps(error_data))
+                    requests.post(self.webhook, headers=self.headers, data=json.dumps(error_data), verify=verify)
                 return result
 
 
