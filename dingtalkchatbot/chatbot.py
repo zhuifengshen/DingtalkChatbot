@@ -90,9 +90,9 @@ class DingtalkChatbot(object):
         
         sign = quote_plus(base64.b64encode(hmac_code))
         if 'timestamp'in self.webhook:
-            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook[:self.webhook.find('&timestamp')], str(timestamp), sign)  # 更新时间戳
+            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook[:self.webhook.find('&timestamp')], str(timestamp), sign)
         else:
-            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook, str(timestamp), sign)  # 首次初始化
+            self.webhook = '{}&timestamp={}&sign={}'.format(self.webhook, str(timestamp), sign)
 
     def msg_open_type(self, url):
         """
