@@ -275,10 +275,11 @@ class DingtalkChatbot(object):
         logging.debug("FeedCard类型：%s" % data)
         return self.post(data)
 
-    def post(self, data):
+    def post(self, data, verify=True):
         """
         发送消息（内容UTF-8编码）
         :param data: 消息数据（字典）
+        :param verify: 是否校验证书，默认校验
         :return: 返回消息发送结果
         """
         now = time.time()
@@ -299,7 +300,7 @@ class DingtalkChatbot(object):
 
         try:
             post_data = json.dumps(data)
-            response = requests.post(self.webhook, headers=self.headers, data=post_data)
+            response = requests.post(self.webhook, headers=self.headers, data=post_data, verify=verify)
         except requests.exceptions.HTTPError as exc:
             logging.error("消息发送失败， HTTP error: %d, reason: %s" % (exc.response.status_code, exc.response.reason))
             raise
