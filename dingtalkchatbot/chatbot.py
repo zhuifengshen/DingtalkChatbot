@@ -63,7 +63,7 @@ class DingtalkChatbot(object):
         :param fail_notice: 消息发送失败提醒，默认为False不提醒，开发者可以根据返回的消息发送结果自行判断和处理
         """
         super(DingtalkChatbot, self).__init__()
-        self.headers = {'Content-Type': 'application/json; charset=utf-8'}
+        self.headers = {'Content-Type': 'application/json; charset=utf-8','Connection': 'close'}
         self.queue = queue.Queue(20)  # 钉钉官方限流每分钟发送20条信息
         self.webhook = webhook
         self.secret = secret
