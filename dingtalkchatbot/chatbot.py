@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # _*_ coding:utf-8 _*_
 # create time: 07/01/2018 11:35
-__author__ = 'Devin -- http://zhangchuzhao.site'
+__author__ = 'Devin - https://zhuifengshen.github.io'
 
 import re
 import sys
@@ -63,7 +63,7 @@ class DingtalkChatbot(object):
         :param fail_notice: 消息发送失败提醒，默认为False不提醒，开发者可以根据返回的消息发送结果自行判断和处理
         """
         super(DingtalkChatbot, self).__init__()
-        self.headers = {'Content-Type': 'application/json; charset=utf-8'}
+        self.headers = {'Content-Type': 'application/json; charset=utf-8', 'Connection': 'close'} # fix issue #53
         self.queue = queue.Queue(20)  # 钉钉官方限流每分钟发送20条信息
         self.webhook = webhook
         self.secret = secret
@@ -112,9 +112,9 @@ class DingtalkChatbot(object):
         text类型
         :param msg: 消息内容
         :param is_at_all: @所有人时：true，否则为false（可选）
-        :param at_mobiles: 被@人的手机号（注意：可以在msg内容里自定义@手机号的位置，也支持同时@多个手机号，可选）
-        :param at_dingtalk_ids: 被@人的dingtalkId（可选）
-        :param is_auto_at: 是否自动在msg内容末尾添加@手机号，默认自动添加，可设置为False取消（可选）
+        :param at_mobiles: 被@用户的手机号
+        :param at_dingtalk_ids: 被@用户的UserId（企业内部机器人可用，可选）
+        :param is_auto_at: 是否自动在msg内容末尾添加@手机号，默认自动添加，也可设置为False，然后自行在msg内容中自定义@手机号的位置，才有@效果，支持同时@多个手机号（可选）
         :return: 返回消息发送结果
         """
         data = {"msgtype": "text", "at": {}}
@@ -136,14 +136,14 @@ class DingtalkChatbot(object):
 
         if at_dingtalk_ids:
             at_dingtalk_ids = list(map(str, at_dingtalk_ids))
-            data["at"]["atDingtalkIds"] = at_dingtalk_ids
+            data["at"]["atUserIds"] = at_dingtalk_ids
 
         logging.debug('text类型：%s' % data)
         return self.post(data)
 
     def send_image(self, pic_url):
         """
-        image类型（表情）
+        image类型
         :param pic_url: 图片链接
         :return: 返回消息发送结果
         """
@@ -192,9 +192,9 @@ class DingtalkChatbot(object):
         :param title: 首屏会话透出的展示内容
         :param text: markdown格式的消息内容
         :param is_at_all: @所有人时：true，否则为：false（可选）
-        :param at_mobiles: 被@人的手机号（默认自动添加在text内容末尾，可取消自动化添加改为自定义设置，可选）
-        :param at_dingtalk_ids: 被@人的dingtalkId（可选）
-        :param is_auto_at: 是否自动在text内容末尾添加@手机号，默认自动添加，可设置为False取消（可选）        
+        :param at_mobiles: 被@人的手机号
+        :param at_dingtalk_ids: 被@用户的UserId（企业内部机器人可用，可选）
+        :param is_auto_at: 是否自动在text内容末尾添加@手机号，默认自动添加，也可设置为False，然后自行在text内容中自定义@手机号的位置，才有@效果，支持同时@多个手机号（可选）
         :return: 返回消息发送结果
         """
         if all(map(is_not_null_and_blank_str, [title, text])):
@@ -220,7 +220,7 @@ class DingtalkChatbot(object):
 
             if at_dingtalk_ids:
                 at_dingtalk_ids = list(map(str, at_dingtalk_ids))
-                data["at"]["atDingtalkIds"] = at_dingtalk_ids
+                data["at"]["atUserIds"] = at_dingtalk_ids
 
             logging.debug("markdown类型：%s" % data)
             return self.post(data)
@@ -326,8 +326,8 @@ class DingtalkChatbot(object):
                     error_data = {
                       "msgtype": "text",
                       "text": {
-                        "content": "[注意-自动通知]钉钉机器人消息发送失败，时间：%s，原因：%s，请及时跟进，谢谢!" % (
-                          time_now, result['errmsg'] if result.get('errmsg', False) else '未知异常')
+                        "content": "[异常通知]钉钉机器人消息发送失败，失败时间：%s，失败原因：%s，要发送的消息：%s，请及时跟进，谢谢!" % (
+                          time_now, result['errmsg'] if result.get('errmsg', False) else '未知异常', post_data)
                         },
                       "at": {
                         "isAtAll": False
@@ -361,7 +361,7 @@ class ActionCard(object):
             if isinstance(btn, CardItem):
                 btn_list.append(btn.get_data())
         if btn_list:
-            btns = btn_list  # 兼容：1、传入CardItem示例列表；2、传入数据字典列表
+            btns = btn_list  # 兼容：1、传入CardItem列表；2、传入数据字典列表
         self.btns = btns
 
     def get_data(self):
@@ -404,7 +404,7 @@ class ActionCard(object):
 
 class FeedLink(object):
     """
-    FeedCard类型单条消息格式
+    FeedCard类型单条消息格式（已废弃，直接使用 CardItem 即可）
     """
     def __init__(self, title, message_url, pic_url):
         """
